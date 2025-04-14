@@ -1,7 +1,20 @@
 from django.db import models
 
+class EggGroup(models.Model):
+    name = models.CharField(max_length=50, unique=True, verbose_name="Nombre del Grupo Huevo")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Grupo Huevo"
+        verbose_name_plural = "Grupos Huevo"
+
+
 class Type(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Nombre del Tipo")
+    rgb = models.CharField(max_length=7, verbose_name="Color HEX", help_text="Ejemplo: #FF0000", default='#FFFFFF')
+    icon = models.ImageField(upload_to='img/types', verbose_name="Icono del Tipo", default='img/types/default_icon.png')
 
     def __str__(self):
         return self.name
@@ -11,15 +24,16 @@ class Type(models.Model):
         verbose_name_plural = 'Tipos'
 
 
+
 class TypeEffectiveness(models.Model):
     attacking_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='ventajas_ofensivas', verbose_name="Tipo Atacante")
     defending_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='ventajas_defensivas', verbose_name="Tipo Defensor")
     multiplier = models.FloatField(help_text="Por ejemplo: 2.0, 0.5, 0.0, 1.0", verbose_name="Multiplicador")
 
     class Meta:
-        unique_together = ('attacking_type', 'defending_type')
         verbose_name = 'Efectividad de Tipo'
         verbose_name_plural = 'Efectividades de Tipos'
+        constraints = [models.UniqueConstraint(fields=['attacking_type', 'defending_type'], name='unique_type_effectiveness')]
 
     def __str__(self):
         return f"{self.attacking_type} → {self.defending_type}: x{self.multiplier}"
@@ -69,24 +83,58 @@ class Pokemon(models.Model):
     pokedex_number = models.PositiveIntegerField(unique=True, verbose_name="Número de la Pokédex")
     name = models.CharField(max_length=100, verbose_name="Nombre del Pokémon")
     pokedex_entry = models.TextField(verbose_name="Entrada de la Pokédex")
+    generation = models.PositiveSmallIntegerField(default=1, verbose_name="Generación")
     hp = models.PositiveIntegerField(verbose_name="Vida")
     attack = models.PositiveIntegerField(verbose_name="Ataque")
     defense = models.PositiveIntegerField(verbose_name="Defensa")
     special_attack = models.PositiveIntegerField(verbose_name="Ataque Especial")
     special_defense = models.PositiveIntegerField(verbose_name="Defensa Especial")
     speed = models.PositiveIntegerField(verbose_name="Velocidad")
-    normal_image = models.ImageField(upload_to='static/pokemons/normal/', blank=True, null=True, verbose_name="Imagen Normal")
-    shiny_image = models.ImageField(upload_to='pokemons/pokemons/shiny/', blank=True, null=True, verbose_name="Imagen Shiny")
+    normal_image = models.ImageField(upload_to='img/pokemons/normal/', blank=True, null=True, verbose_name="Imagen Normal")
+    shiny_image = models.ImageField(upload_to='img/pokemons/shiny/', blank=True, null=True, verbose_name="Imagen Shiny")
     weight = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Peso")
     height = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Altura")
     capture_rate = models.PositiveIntegerField(verbose_name="Ratio de Captura")
     gender = models.CharField(max_length=20, choices=SEX_CHOICES, verbose_name="Posibles géneros")
-    primary_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='pokemones_tipo_principal', verbose_name="Tipo Principal")
-    secondary_type = models.ForeignKey(Type, on_delete=models.SET_NULL, null=True, blank=True, related_name='pokemones_tipo_secundario', verbose_name="Tipo Secundario")
+    egg_groups = models.ManyToManyField(EggGroup, verbose_name="Grupos Huevo")
+    primary_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='pokemons_tipo_principal', verbose_name="Tipo Principal")
+    secondary_type = models.ForeignKey(Type, on_delete=models.SET_NULL, null=True, blank=True, related_name='pokemons_tipo_secundario', verbose_name="Tipo Secundario")
+    moves = models.ManyToManyField('Move', verbose_name="Movimientos")
+    primary_ability = models.ForeignKey(Ability, on_delete=models.CASCADE, related_name='primary_pokemons', verbose_name="Habilidad Principal", default=1)
+    secondary_ability = models.ForeignKey(Ability, on_delete=models.SET_NULL, null=True, blank=True, related_name='secondary_pokemons', verbose_name="Habilidad Secundaria")
+    hidden_ability = models.ForeignKey(Ability, on_delete=models.SET_NULL, null=True, blank=True, related_name='hidden_pokemons', verbose_name="Habilidad Oculta")
+    evolution_method = models.TextField(null=True, blank=True, verbose_name="Método de Evolución")
+    pre_evolution  = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='evolutions', verbose_name="Evoluciona de")
+    #evolutions = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='pre_evolution', verbose_name="Evoluciona a")
 
     def __str__(self):
         return f"{self.pokedex_number} - {self.name}"
 
+    @property
+    def base_stat_total(self):
+        return sum([self.hp, self.attack, self.defense, self.special_attack, self.special_defense, self.speed])
+
     class Meta:
         verbose_name = 'Pokémon'
         verbose_name_plural = 'Pokemons'
+
+class MegaEvolution(models.Model):
+    base_pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE, related_name='megaevolutions', verbose_name="Pokémon Base")
+    name = models.CharField(max_length=100, verbose_name="Nombre de Mega Evolución")
+    normal_image = models.ImageField(upload_to='img/pokemons/megaevolutions/normal/', verbose_name="Imagen Mega Evolución Normal")
+    shiny_image = models.ImageField(upload_to='img/pokemons/megaevolutions/shiny/', verbose_name="Imagen Mega Evolución Shiny")
+    hp = models.PositiveIntegerField(verbose_name="Vida")
+    attack = models.PositiveIntegerField(verbose_name="Ataque")
+    defense = models.PositiveIntegerField(verbose_name="Defensa")
+    special_attack = models.PositiveIntegerField(verbose_name="Ataque Especial")
+    special_defense = models.PositiveIntegerField(verbose_name="Defensa Especial")
+    speed = models.PositiveIntegerField(verbose_name="Velocidad")
+    ability = models.ForeignKey(Ability, on_delete=models.CASCADE, verbose_name="Habilidad")
+    evolution_method = models.TextField(null=True, blank=True, verbose_name="Método de Mega Evolución")
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Mega Evolución"
+        verbose_name_plural = "Mega Evoluciones"
