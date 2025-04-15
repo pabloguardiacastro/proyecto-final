@@ -36,7 +36,7 @@ class TypeEffectiveness(models.Model):
     ]
     attacking_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='ventajas_ofensivas', verbose_name="Tipo Atacante")
     defending_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='ventajas_defensivas', verbose_name="Tipo Defensor")
-    multiplier = models.DecimalField(max_digits=3, decimal_places=2, choices=MULTIPLIER_CHOICES, verbose_name="Multiplicador")
+    multiplier = models.DecimalField(max_digits=3, decimal_places=2, choices=MULTIPLIER_CHOICES, default=Decimal('1.0'), verbose_name="Multiplicador")
 
     class Meta:
         verbose_name = 'Efectividad de Tipo'
