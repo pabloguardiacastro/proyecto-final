@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 
 class EggGroup(models.Model):
@@ -26,9 +28,15 @@ class Type(models.Model):
 
 
 class TypeEffectiveness(models.Model):
+    MULTIPLIER_CHOICES = [
+        (Decimal('0.0'), '0x'),
+        (Decimal('0.5'), '0.5x'),
+        (Decimal('1.0'), '1x'),
+        (Decimal('2.0'), '2x'),
+    ]
     attacking_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='ventajas_ofensivas', verbose_name="Tipo Atacante")
     defending_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='ventajas_defensivas', verbose_name="Tipo Defensor")
-    multiplier = models.FloatField(help_text="Por ejemplo: 2.0, 0.5, 0.0, 1.0", verbose_name="Multiplicador")
+    multiplier = models.DecimalField(max_digits=3, decimal_places=2, choices=MULTIPLIER_CHOICES, verbose_name="Multiplicador")
 
     class Meta:
         verbose_name = 'Efectividad de Tipo'
