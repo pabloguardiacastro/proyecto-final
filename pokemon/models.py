@@ -69,8 +69,9 @@ class Move(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nombre del Movimiento")
     movement_type = models.CharField(max_length=10, choices=MOVEMENT_TYPE_CHOICES, verbose_name="Tipo de Movimiento")
     type = models.ForeignKey(Type, on_delete=models.CASCADE, verbose_name="Tipo del Movimiento")
-    power = models.PositiveIntegerField(verbose_name="Poder")
-    description = models.TextField(blank=True, verbose_name="Descripción del Efecto Secundario")
+    power = models.PositiveIntegerField(default=0, verbose_name="Poder")
+    accuracy = models.PositiveIntegerField(default=100, verbose_name="Precisión")
+    description = models.TextField(blank=True, verbose_name="Descripción del Movimiento")
 
     def __str__(self):
         return f"{self.name} ({self.movement_type})"
