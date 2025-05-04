@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 
 class EggGroup(models.Model):
@@ -89,7 +90,7 @@ class Pokemon(models.Model):
         ('unknown', 'Desconocido'),
     ]
 
-    pokedex_number = models.PositiveIntegerField(unique=True, verbose_name="Número de la Pokédex")
+    pokedex_number = models.PositiveIntegerField(unique=True, null=True, blank=True, verbose_name="Número de la Pokédex")
     name = models.CharField(max_length=100, verbose_name="Nombre del Pokémon")
     pokedex_entry = models.TextField(verbose_name="Entrada de la Pokédex")
     generation = models.PositiveSmallIntegerField(default=1, verbose_name="Generación")
@@ -115,6 +116,7 @@ class Pokemon(models.Model):
     evolution_method = models.TextField(null=True, blank=True, verbose_name="Método de Evolución")
     pre_evolution  = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='evolutions', verbose_name="Evoluciona de")
     #evolutions = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='pre_evolution', verbose_name="Evoluciona a")
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Creador")
 
     def __str__(self):
         return f"{self.pokedex_number} - {self.name}"
@@ -138,8 +140,14 @@ class MegaEvolution(models.Model):
     special_attack = models.PositiveIntegerField(verbose_name="Ataque Especial")
     special_defense = models.PositiveIntegerField(verbose_name="Defensa Especial")
     speed = models.PositiveIntegerField(verbose_name="Velocidad")
+    weight = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Peso")
+    height = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Altura")
+    primary_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='megas_tipo_principal', verbose_name="Tipo Principal")
+    secondary_type = models.ForeignKey(Type, on_delete=models.SET_NULL, null=True, blank=True, related_name='megas_tipo_secundario', verbose_name="Tipo Secundario")
     ability = models.ForeignKey(Ability, on_delete=models.CASCADE, verbose_name="Habilidad")
     evolution_method = models.TextField(null=True, blank=True, verbose_name="Método de Mega Evolución")
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Creador")
+
 
     def __str__(self):
         return f"{self.name}"
