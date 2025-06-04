@@ -1,0 +1,61 @@
+<style>
+    .type-table {
+        margin: 0 auto;
+        border-collapse: collapse;
+        text-align: center;
+    }
+    .type-table th,
+    .type-table td {
+        border: 1px solid;
+        padding: 5px;
+        width: 40px;
+        height: 40px;
+    }
+    .type-table th img,
+    .type-table td img {
+        width: 40px;
+        height: 40px;
+    }
+    .effectiveness-strong {
+        background-color: #66bb6a;
+    }
+    .effectiveness-weak {
+        background-color: #ef5350;
+    }
+    .effectiveness-immune {
+        background-color: #9e9e9e;
+    }
+</style>
+
+<table class="type-table">
+    <thead>
+        <tr>
+            <th>Tipo</th>
+            {% for defender in types %}
+                <th><img src="{{ defender.icon.url }}" alt="{{ defender.name }}" style="width: 30px; height: 30px;"></th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for attacker in types %}
+            <tr>
+                <td><img src="{{ attacker.icon.url }}" alt="{{ attacker.name }}" style="width: 30px; height: 30px;"></td>
+                {% for defender in types %}
+                    {% for effectiveness in effectiveness %}
+                        {% if effectiveness.attacking_type.id == attacker.id and effectiveness.defending_type.id == defender.id %}
+                            {% if effectiveness.multiplier == 0 %}
+                                <td class="effectiveness-immune">x{{ effectiveness.multiplier|floatformat:"0" }}</td>
+                            {% elif effectiveness.multiplier < 1 %}
+                                <td class="effectiveness-weak">x{{ effectiveness.multiplier|floatformat:"-1" }}</td>
+                            {% elif effectiveness.multiplier > 1 %}
+                                <td class="effectiveness-strong">x{{ effectiveness.multiplier|floatformat:"0" }}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

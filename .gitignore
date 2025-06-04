@@ -1,0 +1,33 @@
+# Entornos virtuales
+venv/
+.env/
+*.env
+
+# Archivos de Python
+*.pyc
+__pycache__/
+
+# Archivos de configuración de PyCharm / VS Code
+.idea/
+.vscode/
+
+# Archivos de la base de datos local
+*.sqlite3
+
+# Archivos de migraciones (opcional)
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# Archivos de medios y estáticos generados
+/media/
+staticfiles/
+media/
+
+# Archivos de caché de Django o herramientas de imagen
+/media/cache/
+*.bak
+*.log
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
