@@ -6,6 +6,7 @@ venv/
 # Archivos de Python
 *.pyc
 __pycache__/
+**/__pycache__/
 
 # Archivos de configuración de PyCharm / VS Code
 .idea/
@@ -17,6 +18,8 @@ __pycache__/
 # Archivos de migraciones (opcional)
 */migrations/__pycache__/
 */migrations/*.pyc
+**/migrations/
+!*/migrations/__init__.py
 
 # Archivos de medios y estáticos generados
 /media/
