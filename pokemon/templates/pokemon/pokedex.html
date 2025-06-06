@@ -1,31 +1,27 @@
+{% extends 'base.html' %}
 {% load thumbnail %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Pokédex</title>
-    <style>
-        .pokemon {
-            border: 3px solid;
-            margin: 10px;
-            padding: 10px;
-            display: inline-block;
-            width: 200px;
-            text-align: center;
-        }
-        .pokemon img {
-            width: 96px;
-            height: 96px;
-        }
-        .type-icon {
-            width: 24px;
-            height: 24px;
-            object-fit: contain;
-            vertical-align: middle;
-        }
-    </style>
-</head>
+{% block content %}
+<style>
+    .pokemon {
+        border: 3px solid;
+        margin: 10px;
+        padding: 10px;
+        display: inline-block;
+        width: 200px;
+        text-align: center;
+    }
+    .pokemon img {
+        width: 96px;
+        height: 96px;
+    }
+    .type-icon {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+        vertical-align: middle;
+    }
+</style>
 <body>
     <h1>Pokédex</h1>
     <div class="pokedex">
@@ -50,4 +46,4 @@
         {% endfor %}
     </div>
 </body>
-</html>
+{% endblock %}
