@@ -86,14 +86,14 @@ class Pokemon(models.Model):
     SEX_CHOICES = [
         ('male', 'Macho'),
         ('female', 'Hembra'),
-        ('both', 'Ambos'),
+        ('both', 'Macho/Hembra'),
         ('unknown', 'Desconocido'),
     ]
 
     pokedex_number = models.PositiveIntegerField(unique=True, null=True, blank=True, verbose_name="Número de la Pokédex")
     name = models.CharField(max_length=100, verbose_name="Nombre del Pokémon")
     pokedex_entry = models.TextField(verbose_name="Entrada de la Pokédex")
-    generation = models.PositiveSmallIntegerField(default=1, verbose_name="Generación")
+    generation = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="Generación")
     hp = models.PositiveIntegerField(verbose_name="Vida")
     attack = models.PositiveIntegerField(verbose_name="Ataque")
     defense = models.PositiveIntegerField(verbose_name="Defensa")
