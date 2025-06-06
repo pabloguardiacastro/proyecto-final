@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% load static %}
+{% load thumbnail %}
+
+{% block content %}
+<style>
+  .pokemon-detail-container {
+    display: flex;
+    gap: 2rem;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 1rem;
+  }
+
+  .pokemon-card {
+    flex: 1 1 300px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #fafafa;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .pokemon-image {
+    display: block;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+  }
+
+  .type-icon {
+    height: 24px;
+    margin-right: 0.3rem;
+    vertical-align: middle;
+  }
+
+  .pokemon-description {
+    flex: 2 1 500px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .pokemon-description h3 {
+    margin-top: 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+  }
+
+  .mega-evolutions,
+  .evolution-chain {
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  .evolution-node {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .pokemon-card-small {
+    text-align: center;
+  }
+
+  .pokemon-card-small img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+  }
+
+  .evolution-arrow {
+    font-weight: bold;
+    font-size: 20px;
+  }
+
+  .evo-method {
+    font-style: italic;
+    font-size: 0.8em;
+  }
+</style>
+
+<div class="pokemon-detail-container">
+  <!-- Columna izquierda: carta con datos básicos -->
+  <div class="pokemon-card">
+    {% if pokemon.normal_image %}
+      {% thumbnail pokemon.normal_image "150x150" format="PNG" crop="center" as thumb %}
+        <img src="{{ thumb.url }}" alt="{{ pokemon.name }}" class="pokemon-image">
+      {% endthumbnail %}
+    {% endif %}
+
+    <h2>{{ pokemon.name }}</h2>
+
+    <p>
+      <strong>Tipos:</strong>
+      <img src="{{ pokemon.primary_type.icon.url }}" class="type-icon" alt="{{ pokemon.primary_type.name }}">
+      {% if pokemon.secondary_type %}
+        <img src="{{ pokemon.secondary_type.icon.url }}" class="type-icon" alt="{{ pokemon.secondary_type.name }}">
+      {% endif %}
+    </p>
+
+    <p><strong>Número Pokédex:</strong> {% if pokemon.pokedex_number %}#{{ pokemon.pokedex_number }}{% else %}Original{% endif %}</p>
+
+    <p><strong>HP:</strong> {{ pokemon.hp }}</p>
+    <p><strong>Ataque:</strong> {{ pokemon.attack }}</p>
+    <p><strong>Defensa:</strong> {{ pokemon.defense }}</p>
+    <p><strong>Ataque Especial:</strong> {{ pokemon.special_attack }}</p>
+    <p><strong>Defensa Especial:</strong> {{ pokemon.special_defense }}</p>
+    <p><strong>Velocidad:</strong> {{ pokemon.speed }}</p>
+  </div>
+
+  <div class="pokemon-description">
+    <h3>Entrada de la Pokédex</h3>
+    {% if pokemon.pokedex_entry %}
+      <p>{{ pokemon.pokedex_entry }}</p>
+    {% else %}
+      <p>No existe una entrada de la pokédex para este pokemon</p>
+    {% endif %}
+
+    <div class="pokemon-resistance-weakness">
+      {% if immunities %}
+        <h4>Inmunidades (x0)</h4>
+        <p>
+          {% for type in immunities %}
+            <img src="{{ type.icon.url }}" alt="{{ type.name }}" class="type-icon" title="{{ type.name }}">
+          {% endfor %}
+        </p>
+      {% endif %}
+
+      {% if super_resistances %}
+        <h4>Super resistencias (x0.25)</h4>
+        <p>
+          {% for type in super_resistances %}
+            <img src="{{ type.icon.url }}" alt="{{ type.name }}" class="type-icon" title="{{ type.name }}">
+          {% endfor %}
+        </p>
+      {% endif %}
+
+      {% if resistances %}
+        <h4>Resistencias (x0.5)</h4>
+        <p>
+          {% for type in resistances %}
+            <img src="{{ type.icon.url }}" alt="{{ type.name }}" class="type-icon" title="{{ type.name }}">
+          {% endfor %}
+        </p>
+      {% endif %}
+
+      {% if neutral %}
+        <h4>Neutral (x1)</h4>
+        <p>
+          {% for type in neutral %}
+            <img src="{{ type.icon.url }}" alt="{{ type.name }}" class="type-icon" title="{{ type.name }}">
+          {% endfor %}
+        </p>
+      {% endif %}
+
+      {% if weaknesses %}
+        <h4>Debilidades (x2)</h4>
+        <p>
+          {% for type in weaknesses %}
+            <img src="{{ type.icon.url }}" alt="{{ type.name }}" class="type-icon" title="{{ type.name }}">
+          {% endfor %}
+        </p>
+      {% endif %}
+
+      {% if super_weaknesses %}
+        <h4>Súper debilidades (x4)</h4>
+        <p>
+          {% for type in super_weaknesses %}
+            <img src="{{ type.icon.url }}" alt="{{ type.name }}" class="type-icon" title="{{ type.name }}">
+          {% endfor %}
+        </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="evolution-chain">
+  <h3>Cadena evolutiva</h3>
+  {% include "pokemon/pokemon_evolution_chain.html" with node=chain %}
+</div>
+
+{% if pokemon.megaevolutions.all %}
+  <div class="mega-evolutions" style="margin-top: 40px;">
+    <h3>Megaevoluciones</h3>
+    <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+      {% for mega in pokemon.megaevolutions.all %}
+        <div class="pokemon-card-small" style="text-align: center;">
+          {% if mega.normal_image %}
+            {% thumbnail mega.normal_image "96x96" format="PNG" crop="center" as thumb %}
+              <img src="{{ thumb.url }}" alt="{{ mega.name }}">
+            {% endthumbnail %}
+          {% endif %}
+          <div>{{ mega.name }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

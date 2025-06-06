@@ -1,0 +1,24 @@
+{% load thumbnail %}
+
+<div class="evolution-node">
+  <div class="pokemon-card-small">
+    {% if node.pokemon.normal_image %}
+      {% thumbnail node.pokemon.normal_image "64x64" format="PNG" crop="center" as thumb %}
+        <a href="{% url 'pokemon:pokemon' node.pokemon.id %}"><img src="{{ thumb.url }}" alt="{{ node.pokemon.name }}"></a>
+      {% endthumbnail %}
+    {% endif %}
+    <div>{{ node.pokemon.name }}</div>
+  </div>
+
+  {% if node.evolutions %}
+    <div style="display: flex; gap: 30px; justify-content: center; flex-direction: column; margin-top: 10px;">
+      {% for evo in node.evolutions %}
+        <div style="text-align: center; display: flex; flex-direction: row; align-items: center;">
+          <div class="evolution-arrow" style="font-size: 20px;">→</div>
+          <div class="evo-method" style="font-size: 0.9em; margin-bottom: 8px;">{{ evo.pokemon.evolution_method|default:"Método desconocido" }}</div>
+          {% include "pokemon/pokemon_evolution_chain.html" with node=evo %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

@@ -125,6 +125,22 @@ class Pokemon(models.Model):
     def base_stat_total(self):
         return sum([self.hp, self.attack, self.defense, self.special_attack, self.special_defense, self.speed])
 
+    def get_base_pokemon(self):
+        current = self
+        while current.pre_evolution:
+            current = current.pre_evolution
+        return current
+
+    def get_evolution_chain(self):
+        return {
+            'pokemon': self,
+            'evolutions': [evo.get_evolution_chain() for evo in self.evolutions.all()]
+        }
+
+    def get_full_chain(self):
+        base = self.get_base_pokemon()
+        return base.get_evolution_chain()
+
     class Meta:
         verbose_name = 'Pokémon'
         verbose_name_plural = 'Pokemons'
