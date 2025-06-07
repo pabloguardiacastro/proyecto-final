@@ -164,9 +164,12 @@ class MegaEvolution(models.Model):
     evolution_method = models.TextField(null=True, blank=True, verbose_name="Método de Mega Evolución")
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Creador")
 
-
     def __str__(self):
         return f"{self.name}"
+
+    @property
+    def base_stat_total(self):
+        return sum([self.hp, self.attack, self.defense, self.special_attack, self.special_defense, self.speed])
 
     class Meta:
         verbose_name = "Mega Evolución"

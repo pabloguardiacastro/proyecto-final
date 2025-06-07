@@ -21,6 +21,10 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
+  .pokemon-card p {
+    border-bottom: solid 2px #eee;
+  }
+
   .pokemon-image {
     display: block;
     margin: 0 auto 1rem;
@@ -105,7 +109,6 @@
 </style>
 
 <div class="pokemon-detail-container">
-  <!-- Columna izquierda: carta con datos básicos -->
   <div class="pokemon-card">
     {% if pokemon.normal_image %}
       {% thumbnail pokemon.normal_image "150x150" format="PNG" crop="center" as thumb %}
@@ -142,14 +145,20 @@
     <p><strong>Ataque Especial:</strong> {{ pokemon.special_attack }}</p>
     <p><strong>Defensa Especial:</strong> {{ pokemon.special_defense }}</p>
     <p><strong>Velocidad:</strong> {{ pokemon.speed }}</p>
+    <p><strong>Estadísticas totales:</strong> {{ pokemon.base_stat_total }}</p>
+    {% if pokemon.base_pokemon %}
+      <h2>Pokémon base</h2>
+      <p><strong>{{ pokemon.base_pokemon.name }}</strong></p>
+      {% thumbnail pokemon.base_pokemon.normal_image "150x150" format="PNG" crop="center" as thumb %}
+        <a href="{% url 'pokemon:pokemon' pokemon.base_pokemon.id %}"><img src="{{ thumb.url }}" alt="{{ pokemon.name }}" class="pokemon-image"></a>
+      {% endthumbnail %}
+    {% endif %}
   </div>
 
   <div class="pokemon-description">
-    <h3>Entrada de la Pokédex</h3>
     {% if pokemon.pokedex_entry %}
+      <h3>Entrada de la Pokédex</h3>
       <p>{{ pokemon.pokedex_entry }}</p>
-    {% else %}
-      <p>No existe una entrada de la pokédex para este pokemon</p>
     {% endif %}
 
     <h3>Efectividades de tipo</h3>
@@ -221,26 +230,42 @@
         </tr>
       </thead>
       <tbody>
-        {% for move in pokemon.moves.all %}
-          <tr>
-            <td>{{ move.name }}</td>
-            <td><img src="{{ move.type.icon.url }}" alt="{{ move.type.name }}" class="type-icon"></td>
-            <td>{{ move.get_movement_type_display }}</td>
-            <td>{{ move.power|default:"–" }}</td>
-            <td>{{ move.accuracy }}%</td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="7">Este Pokémon no tiene movimientos registrados.</td></tr>
-        {% endfor %}
+        {% if pokemon.moves %}
+          {% for move in pokemon.moves.all %}
+            <tr>
+              <td>{{ move.name }}</td>
+              <td><img src="{{ move.type.icon.url }}" alt="{{ move.type.name }}" class="type-icon"></td>
+              <td>{{ move.get_movement_type_display }}</td>
+              <td>{{ move.power|default:"–" }}</td>
+              <td>{{ move.accuracy }}%</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7">Este Pokémon no tiene movimientos registrados.</td></tr>
+          {% endfor %}
+        {% else %}
+          {% for move in pokemon.base_pokemon.moves.all %}
+            <tr>
+              <td>{{ move.name }}</td>
+              <td><img src="{{ move.type.icon.url }}" alt="{{ move.type.name }}" class="type-icon"></td>
+              <td>{{ move.get_movement_type_display }}</td>
+              <td>{{ move.power|default:"–" }}</td>
+              <td>{{ move.accuracy }}%</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7">Este Pokémon no tiene movimientos registrados.</td></tr>
+          {% endfor %}
+        {% endif %}
       </tbody>
     </table>
   </div>
 </div>
 
-<div class="evolution-chain">
-  <h3>Cadena evolutiva</h3>
-  {% include "pokemon/pokemon_evolution_chain.html" with node=chain %}
-</div>
+{% if chain %}
+  <div class="evolution-chain">
+    <h3>Cadena evolutiva</h3>
+    {% include "pokemon/pokemon_evolution_chain.html" with node=chain %}
+  </div>
+{% endif %}
 
 {% if pokemon.megaevolutions.all %}
   <div class="mega-evolutions" style="margin-top: 40px;">
@@ -250,7 +275,7 @@
         <div class="pokemon-card-small" style="text-align: center;">
           {% if mega.normal_image %}
             {% thumbnail mega.normal_image "96x96" format="PNG" crop="center" as thumb %}
-              <img src="{{ thumb.url }}" alt="{{ mega.name }}">
+              <a href="{% url 'pokemon:megaevolution' mega.id %}"><img src="{{ thumb.url }}" alt="{{ mega.name }}"></a>
             {% endthumbnail %}
           {% endif %}
           <div>{{ mega.name }}</div>
