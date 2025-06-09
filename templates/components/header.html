@@ -7,6 +7,15 @@
             <ul>
                 <li><a href="{% url 'pokemon:pokedex' %}">Inicio</a></li>
                 <li><a href="{% url 'pokemon:type_table' %}">Tabla de Tipos</a></li>
+                {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-button">Cerrar sesión</button>
+                    </form>
+                {% else %}
+                  <li><a href="{% url 'login' %}">Iniciar sesión</a></li>
+                  <li><a href="{% url 'signup' %}">Registrarse</a></li>
+                {% endif %}
             </ul>
         </nav>
     </div>
