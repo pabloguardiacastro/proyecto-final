@@ -128,13 +128,17 @@
     {% if pokemon.pokedex_number %}
       <p><strong>Número Pokédex:</strong> #{{ pokemon.pokedex_number }}</p>
       <p><strong>Generación:</strong> {{ pokemon.generation }}º</p>
-    {% else %}
+    {% elif pokemon.creator %}
       <p><strong>Creado por:</strong> {{ pokemon.creator.name|default:"Anónimo" }}</p>
     {% endif %}
-    <p><strong>Sexo:</strong> {{ pokemon.get_gender_display }}</p>
-    <p><strong>Grupos huevo:</strong> {% for group in pokemon.egg_groups.all %}{{ group.name }} {% endfor %}</p>
+    {% if pokemon.gender %}
+      <p><strong>Sexo:</strong> {{ pokemon.get_gender_display }}</p>
+    {% endif %}
+    {% if pokemon.egg_groups %}
+      <p><strong>Grupos huevo:</strong> {% for group in pokemon.egg_groups.all %}{{ group.name }} {% endfor %}</p>
+    {% endif %}
 
-    <p><strong>Habilidad{% if pokemon.secondary_ability %}es{% endif %}:</strong> {{ pokemon.primary_ability.name }}{% if pokemon.secondary_ability %}, {{ pokemon.secondary_ability.name }}{% endif %}</p>
+    <p><strong>Habilidad{% if pokemon.secondary_ability %}es{% endif %}:</strong> {{ pokemon.primary_ability.name }}{{ pokemon.ability.name }}{% if pokemon.secondary_ability %}, {{ pokemon.secondary_ability.name }}{% endif %}</p>
     {% if pokemon.hidden_ability %}
       <p><strong>Habilidad oculta:</strong> {{ pokemon.hidden_ability.name }}</p>
     {% endif %}
