@@ -104,12 +104,12 @@ class Pokemon(models.Model):
     #shiny_image = models.ImageField(upload_to='img/pokemons/shiny/', blank=True, null=True, verbose_name="Imagen Shiny")
     weight = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Peso")
     height = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Altura")
-    capture_rate = models.PositiveIntegerField(verbose_name="Ratio de Captura")
+    capture_rate = models.PositiveIntegerField(null=True, blank=True, verbose_name="Ratio de Captura")
     gender = models.CharField(max_length=20, choices=SEX_CHOICES, verbose_name="Posibles géneros")
     egg_groups = models.ManyToManyField(EggGroup, verbose_name="Grupos Huevo")
     primary_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='pokemons_tipo_principal', verbose_name="Tipo Principal")
     secondary_type = models.ForeignKey(Type, on_delete=models.SET_NULL, null=True, blank=True, related_name='pokemons_tipo_secundario', verbose_name="Tipo Secundario")
-    moves = models.ManyToManyField('Move', verbose_name="Movimientos")
+    moves = models.ManyToManyField('Move', verbose_name="Movimientos", blank=True)
     primary_ability = models.ForeignKey(Ability, on_delete=models.CASCADE, related_name='primary_pokemons', verbose_name="Habilidad Principal", default=1)
     secondary_ability = models.ForeignKey(Ability, on_delete=models.SET_NULL, null=True, blank=True, related_name='secondary_pokemons', verbose_name="Habilidad Secundaria")
     hidden_ability = models.ForeignKey(Ability, on_delete=models.SET_NULL, null=True, blank=True, related_name='hidden_pokemons', verbose_name="Habilidad Oculta")
@@ -119,7 +119,10 @@ class Pokemon(models.Model):
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Creador")
 
     def __str__(self):
-        return f"{self.pokedex_number} - {self.name}"
+        if self.pokedex_number:
+            return f"#{self.pokedex_number} - {self.name}"
+        else:
+            return f"{self.name}"
 
     @property
     def base_stat_total(self):

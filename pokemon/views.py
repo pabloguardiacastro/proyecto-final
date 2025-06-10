@@ -1,4 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
+
+from .forms import PokemonForm
 from .models import Pokemon, Type, TypeEffectiveness, MegaEvolution
 from .utils import calculate_combined_effectiveness
 
@@ -81,6 +84,19 @@ def megaevolution_view(request, megaevolution_id):
         'super_weaknesses': super_weaknesses,
     }
     return render(request, 'pokemon/pokemon_detail.html', context)
+
+@login_required
+def pokemon_creation(request):
+    if request.method == 'POST':
+        form = PokemonForm(request.POST, request.FILES)
+        if form.is_valid():
+            pokemon = form.save(commit=False)
+            pokemon.creator = request.user
+            pokemon.save()
+            return redirect('pokemon:pokemon', pokemon_id=pokemon.id)
+    else:
+        form = PokemonForm()
+    return render(request, 'pokemon/create.html', {'form': form})
 
 def type_table(request):
     types = Type.objects.all()

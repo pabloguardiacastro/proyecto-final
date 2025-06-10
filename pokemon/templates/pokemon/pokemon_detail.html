@@ -28,7 +28,6 @@
   .pokemon-image {
     display: block;
     margin: 0 auto 1rem;
-    border-radius: 50%;
   }
 
   .type-icon {
@@ -129,12 +128,12 @@
       <p><strong>Número Pokédex:</strong> #{{ pokemon.pokedex_number }}</p>
       <p><strong>Generación:</strong> {{ pokemon.generation }}º</p>
     {% elif pokemon.creator %}
-      <p><strong>Creado por:</strong> {{ pokemon.creator.name|default:"Anónimo" }}</p>
+      <p><strong>Creado por:</strong> {{ pokemon.creator.username|default:"Anónimo" }}</p>
     {% endif %}
     {% if pokemon.gender %}
       <p><strong>Sexo:</strong> {{ pokemon.get_gender_display }}</p>
     {% endif %}
-    {% if pokemon.egg_groups %}
+    {% if pokemon.egg_groups.all %}
       <p><strong>Grupos huevo:</strong> {% for group in pokemon.egg_groups.all %}{{ group.name }} {% endfor %}</p>
     {% endif %}
 
