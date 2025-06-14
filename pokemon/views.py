@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 
-from .forms import PokemonForm, MegaEvolutionForm, EditMovesForm
-from .models import Pokemon, Type, TypeEffectiveness, MegaEvolution
+from .forms import PokemonForm, MegaEvolutionForm, EditMovesForm, PokemonEditForm
+from .models import Pokemon, Type, TypeEffectiveness, MegaEvolution, Move, Ability
 from .utils import calculate_combined_effectiveness
 
 
@@ -149,6 +150,22 @@ def megaevolution_creation(request, pokemon_id):
     })
 
 @login_required
+def edit_pokemon(request, pokemon_id):
+    pokemon = get_object_or_404(Pokemon, pk=pokemon_id)
+    if request.user != pokemon.creator:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        form = PokemonEditForm(request.POST, request.FILES, instance=pokemon)
+        if form.is_valid():
+            form.save()
+            return redirect('pokemon:pokemon', pokemon_id=pokemon.id)
+    else:
+        form = PokemonEditForm(instance=pokemon)
+
+    return render(request, 'pokemon/edit.html', {'form': form, 'pokemon': pokemon})
+
+@login_required
 def edit_moves(request, pokemon_id):
     pokemon = get_object_or_404(Pokemon, id=pokemon_id)
 
@@ -175,3 +192,11 @@ def type_table(request):
     }
 
     return render(request, 'pokemon/type_table.html', context)
+
+def move_view(request, move_id):
+    move = get_object_or_404(Move, id=move_id)
+    return render(request, 'pokemon/move_detail.html', {'move': move})
+
+def ability_view(request, ability_id):
+    ability = get_object_or_404(Ability, id=ability_id)
+    return render(request, 'pokemon/ability_detail.html', {'ability': ability})

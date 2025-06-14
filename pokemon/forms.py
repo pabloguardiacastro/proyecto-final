@@ -24,3 +24,8 @@ class EditMovesForm(forms.ModelForm):
     class Meta:
         model = Pokemon
         fields = ['moves']
+
+class PokemonEditForm(forms.ModelForm):
+    class Meta:
+        model = Pokemon
+        exclude = ['moves', 'creator', 'pokedex_number', 'pokedex_entry', 'generation', 'evolution_method', 'pre_evolution']

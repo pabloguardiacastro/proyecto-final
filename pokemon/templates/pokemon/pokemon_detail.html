@@ -115,7 +115,11 @@
       {% endthumbnail %}
     {% endif %}
 
-    <h2>{{ pokemon.name }}</h2>
+    <h2>{{ pokemon.name }}
+      {% if request.user == pokemon.creator %}
+        <a href="{% url 'pokemon:edit_pokemon' pokemon.id %}" style="font-size: 0.9rem; padding: 4px 8px; background-color: #007bff; color: white; border-radius: 4px; text-decoration: none;">Editar</a>
+      {% endif %}
+    </h2>
 
     <p>
       <strong>Tipos:</strong>
@@ -136,13 +140,26 @@
     {% if pokemon.egg_groups.all %}
       <p><strong>Grupos huevo:</strong> {% for group in pokemon.egg_groups.all %}{{ group.name }} {% endfor %}</p>
     {% endif %}
-
+    <p><strong>Peso:</strong> {{ pokemon.weight|default:"???" }} kg</p>
+    <p><strong>Altura:</strong> {{ pokemon.height|default:"???" }} m</p>
     {% if pokemon.capture_rate %}
       <p><strong>Ratio de captura:</strong> {{ pokemon.capture_rate }}</p>
     {% endif %}
-    <p><strong>Habilidad{% if pokemon.secondary_ability %}es{% endif %}:</strong> {{ pokemon.primary_ability.name }}{{ pokemon.ability.name }}{% if pokemon.secondary_ability %}, {{ pokemon.secondary_ability.name }}{% endif %}</p>
+    <p><strong>Habilidad{% if pokemon.secondary_ability %}es{% endif %}:</strong>
+      {% if pokemon.primary_ability %}
+        <a href="{% url 'pokemon:ability' pokemon.primary_ability.id %}">{{ pokemon.primary_ability.name }}</a>
+      {% else %}
+        <a href="{% url 'pokemon:ability' pokemon.ability.id %}">{{ pokemon.ability.name }}</a>
+      {% endif %}
+      {% if pokemon.secondary_ability %}
+        , <a href="{% url 'pokemon:ability' pokemon.secondary_ability.id %}">{{ pokemon.secondary_ability.name }}</a>
+      {% endif %}
+    </p>
+
     {% if pokemon.hidden_ability %}
-      <p><strong>Habilidad oculta:</strong> {{ pokemon.hidden_ability.name }}</p>
+      <p><strong>Habilidad oculta:</strong>
+        <a href="{% url 'pokemon:ability' pokemon.hidden_ability.id %}">{{ pokemon.hidden_ability.name }}</a>
+      </p>
     {% endif %}
 
     <p><strong>HP:</strong> {{ pokemon.hp }}</p>
@@ -225,6 +242,7 @@
       {% endif %}
     </div>
 
+    {% if not pokemon.base_pokemon %}
     <h3 style="display: flex; justify-content: space-between; align-items: center;">
       Movimientos
       {% if request.user == pokemon.creator and not pokemon.base_pokemon %}
@@ -247,19 +265,7 @@
         {% if pokemon.moves %}
           {% for move in pokemon.moves.all %}
             <tr>
-              <td>{{ move.name }}</td>
-              <td><img src="{{ move.type.icon.url }}" alt="{{ move.type.name }}" class="type-icon"></td>
-              <td>{{ move.get_movement_type_display }}</td>
-              <td>{{ move.power|default:"–" }}</td>
-              <td>{{ move.accuracy }}%</td>
-            </tr>
-          {% empty %}
-            <tr><td colspan="7">Este Pokémon no tiene movimientos registrados.</td></tr>
-          {% endfor %}
-        {% else %}
-          {% for move in pokemon.base_pokemon.moves.all %}
-            <tr>
-              <td>{{ move.name }}</td>
+              <td><a href="{% url 'pokemon:move' move.id %}">{{ move.name }}</a></td>
               <td><img src="{{ move.type.icon.url }}" alt="{{ move.type.name }}" class="type-icon"></td>
               <td>{{ move.get_movement_type_display }}</td>
               <td>{{ move.power|default:"–" }}</td>
@@ -271,6 +277,7 @@
         {% endif %}
       </tbody>
     </table>
+    {% endif %}
   </div>
 </div>
 

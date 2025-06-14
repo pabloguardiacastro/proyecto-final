@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+
+{% block content %}
+<h1>Habilidad: {{ ability.name }}</h1>
+
+<div style="display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start;">
+  <div style="flex: 1; min-width: 300px;">
+    <h3>Descripción</h3>
+    <p>{{ ability.description }}</p>
+  </div>
+
+  <div style="flex: 2; min-width: 300px;">
+    <h3>Pokémon con esta habilidad</h3>
+
+    <h4>Primaria</h4>
+    {% if ability.primary_pokemons.all %}
+      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        {% for pokemon in ability.primary_pokemons.all %}
+          <a href="{% url 'pokemon:pokemon' pokemon.id %}" style="text-align: center; text-decoration: none;">
+            {% if pokemon.normal_image %}
+              {% thumbnail pokemon.normal_image "96x96" format="PNG" as thumb %}
+                <img src="{{ thumb.url }}" alt="{{ pokemon.name }}">
+              {% endthumbnail %}
+            {% endif %}
+            <div>{{ pokemon.name }}</div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No hay Pokémon con esta habilidad como primaria.</p>
+    {% endif %}
+
+    <h4>Secundaria</h4>
+    {% if ability.secondary_pokemons.all %}
+      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        {% for pokemon in ability.secondary_pokemons.all %}
+          <a href="{% url 'pokemon:pokemon' pokemon.id %}" style="text-align: center; text-decoration: none;">
+            {% if pokemon.normal_image %}
+              {% thumbnail pokemon.normal_image "96x96" format="PNG" as thumb %}
+                <img src="{{ thumb.url }}" alt="{{ pokemon.name }}">
+              {% endthumbnail %}
+            {% endif %}
+            <div>{{ pokemon.name }}</div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No hay Pokémon con esta habilidad como secundaria.</p>
+    {% endif %}
+
+    <h4>Oculta</h4>
+    {% if ability.hidden_pokemons.all %}
+      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        {% for pokemon in ability.hidden_pokemons.all %}
+          <a href="{% url 'pokemon:pokemon' pokemon.id %}" style="text-align: center; text-decoration: none;">
+            {% if pokemon.normal_image %}
+              {% thumbnail pokemon.normal_image "96x96" format="PNG" as thumb %}
+                <img src="{{ thumb.url }}" alt="{{ pokemon.name }}">
+              {% endthumbnail %}
+            {% endif %}
+            <div>{{ pokemon.name }}</div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No hay Pokémon con esta habilidad como oculta.</p>
+    {% endif %}
+
+    <h4>Mega Evoluciones</h4>
+    {% if ability.megaevolutions.all %}
+      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        {% for pokemon in ability.megaevolutions.all %}
+          <a href="{% url 'pokemon:megaevolution' pokemon.id %}" style="text-align: center; text-decoration: none;">
+            {% if pokemon.normal_image %}
+              {% thumbnail pokemon.normal_image "96x96" format="PNG" as thumb %}
+                <img src="{{ thumb.url }}" alt="{{ pokemon.name }}">
+              {% endthumbnail %}
+            {% endif %}
+            <div>{{ pokemon.name }}</div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No hay Pokémon con esta habilidad como oculta.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+
+{% block content %}
+<style>
+  .movement-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 50px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+
+  .movement-info {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .pokemon-list {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .pokemon-card {
+    display: inline-block;
+    text-align: center;
+    margin: 10px;
+  }
+
+  .pokemon-card img {
+    width: 72px;
+    height: 72px;
+  }
+
+  .type-icon {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+  }
+</style>
+
+<h1>{{ move.name }}</h1>
+
+<div class="movement-container">
+  <div class="movement-info">
+    <p><strong>Tipo:</strong>
+      <img src="{{ move.type.icon.url }}" alt="{{ move.type.name }}" class="type-icon">
+    </p>
+    <p><strong>Categoría:</strong> {{ move.get_movement_type_display }}</p>
+    <p><strong>Potencia:</strong> {{ move.power|default:"–" }}</p>
+    <p><strong>Precisión:</strong> {{ move.accuracy|default:"–" }}%</p>
+    {% if move.description %}
+      <p><strong>Descripción:</strong> {{ move.description }}</p>
+    {% endif %}
+  </div>
+
+  <div class="pokemon-list">
+    <h3>Pokémon que conocen este movimiento</h3>
+    {% if move.pokemons.all %}
+      {% for p in move.pokemons.all %}
+        <div class="pokemon-card">
+          <a href="{% url 'pokemon:pokemon' p.id %}">
+            {% if p.normal_image %}
+              {% thumbnail p.normal_image "72x72" format="PNG" as thumb %}
+                <img src="{{ thumb.url }}" alt="{{ p.name }}">
+              {% endthumbnail %}
+            {% endif %}
+            <div>{{ p.name }}</div>
+          </a>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>Ningún Pokémon conoce este movimiento.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
