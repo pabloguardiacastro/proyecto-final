@@ -6,7 +6,10 @@ app_name = 'pokemon'
 urlpatterns = [
     path('pokedex/', views.pokedex_view, name='pokedex'),
     path('type-table/', views.type_table, name='type_table'),
+    path('profile/<username>/', views.profile_view, name='profile'),
     path('pokemon/new/', views.pokemon_creation, name='new_pokemon'),
     path('pokemon/<pokemon_id>/', views.pokemon_view, name='pokemon'),
+    path('pokemon/<pokemon_id>/edit-moves/', views.edit_moves, name='edit_moves'),
+    path('pokemon/<pokemon_id>/mega/new/', views.megaevolution_creation, name='new_megaevolution'),
     path('megaevolution/<megaevolution_id>/', views.megaevolution_view, name='megaevolution'),
 ]

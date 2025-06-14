@@ -110,7 +110,7 @@
 <div class="pokemon-detail-container">
   <div class="pokemon-card">
     {% if pokemon.normal_image %}
-      {% thumbnail pokemon.normal_image "150x150" format="PNG" crop="center" as thumb %}
+      {% thumbnail pokemon.normal_image "150x150" format="PNG" as thumb %}
         <img src="{{ thumb.url }}" alt="{{ pokemon.name }}" class="pokemon-image">
       {% endthumbnail %}
     {% endif %}
@@ -128,7 +128,7 @@
       <p><strong>Número Pokédex:</strong> #{{ pokemon.pokedex_number }}</p>
       <p><strong>Generación:</strong> {{ pokemon.generation }}º</p>
     {% elif pokemon.creator %}
-      <p><strong>Creado por:</strong> {{ pokemon.creator.username|default:"Anónimo" }}</p>
+      <p><strong>Creado por:</strong> {% if pokemon.creator %}<a href="{% url 'pokemon:profile' pokemon.creator.username %}">{{ pokemon.creator.username }}</a>{% else %}Anónimo{% endif %}</p>
     {% endif %}
     {% if pokemon.gender %}
       <p><strong>Sexo:</strong> {{ pokemon.get_gender_display }}</p>
@@ -137,6 +137,9 @@
       <p><strong>Grupos huevo:</strong> {% for group in pokemon.egg_groups.all %}{{ group.name }} {% endfor %}</p>
     {% endif %}
 
+    {% if pokemon.capture_rate %}
+      <p><strong>Ratio de captura:</strong> {{ pokemon.capture_rate }}</p>
+    {% endif %}
     <p><strong>Habilidad{% if pokemon.secondary_ability %}es{% endif %}:</strong> {{ pokemon.primary_ability.name }}{{ pokemon.ability.name }}{% if pokemon.secondary_ability %}, {{ pokemon.secondary_ability.name }}{% endif %}</p>
     {% if pokemon.hidden_ability %}
       <p><strong>Habilidad oculta:</strong> {{ pokemon.hidden_ability.name }}</p>
@@ -152,9 +155,10 @@
     {% if pokemon.base_pokemon %}
       <h2>Pokémon base</h2>
       <p><strong>{{ pokemon.base_pokemon.name }}</strong></p>
-      {% thumbnail pokemon.base_pokemon.normal_image "150x150" format="PNG" crop="center" as thumb %}
+      {% thumbnail pokemon.base_pokemon.normal_image "150x150" format="PNG" as thumb %}
         <a href="{% url 'pokemon:pokemon' pokemon.base_pokemon.id %}"><img src="{{ thumb.url }}" alt="{{ pokemon.name }}" class="pokemon-image"></a>
       {% endthumbnail %}
+      <p><strong>{{ pokemon.evolution_method }}</strong></p>
     {% endif %}
   </div>
 
@@ -221,7 +225,14 @@
       {% endif %}
     </div>
 
-    <h3>Movimientos</h3>
+    <h3 style="display: flex; justify-content: space-between; align-items: center;">
+      Movimientos
+      {% if request.user == pokemon.creator and not pokemon.base_pokemon %}
+        <a href="{% url 'pokemon:edit_moves' pokemon.id %}" class="btn-move-edit" style="font-size: 0.9rem; padding: 4px 8px; background-color: #007bff; color: white; border-radius: 4px; text-decoration: none;">
+          Cambiar movimientos
+        </a>
+      {% endif %}
+    </h3>
     <table class="move-table">
       <thead>
         <tr>
@@ -270,21 +281,29 @@
   </div>
 {% endif %}
 
-{% if pokemon.megaevolutions.all %}
+{% if pokemon.megaevolutions.all or request.user.is_authenticated and not pokemon.base_pokemon %}
   <div class="mega-evolutions" style="margin-top: 40px;">
-    <h3>Megaevoluciones</h3>
-    <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
-      {% for mega in pokemon.megaevolutions.all %}
-        <div class="pokemon-card-small" style="text-align: center;">
-          {% if mega.normal_image %}
-            {% thumbnail mega.normal_image "96x96" format="PNG" crop="center" as thumb %}
-              <a href="{% url 'pokemon:megaevolution' mega.id %}"><img src="{{ thumb.url }}" alt="{{ mega.name }}"></a>
-            {% endthumbnail %}
-          {% endif %}
-          <div>{{ mega.name }}</div>
-        </div>
-      {% endfor %}
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3>Megaevoluciones</h3>
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'pokemon:new_megaevolution' pokemon.id %}" class="btn-crear" style="font-size: 0.9rem; padding: 4px 8px; background-color: #007bff; color: white; border-radius: 4px; text-decoration: none;">Crear Mega Evolución</a>
+      {% endif %}
     </div>
+    {% if pokemon.megaevolutions.all %}
+      <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+        {% for mega in pokemon.megaevolutions.all %}
+          <div class="pokemon-card-small" style="text-align: center;">
+            {% if mega.normal_image %}
+              {% thumbnail mega.normal_image "96x96" format="PNG" as thumb %}
+                <a href="{% url 'pokemon:megaevolution' mega.id %}"><img src="{{ thumb.url }}" alt="{{ mega.name }}"></a>
+              {% endthumbnail %}
+            {% endif %}
+            <div>{{ mega.name }}</div>
+            <p>{{ mega.evolution_method }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
   </div>
 {% endif %}
 {% endblock %}

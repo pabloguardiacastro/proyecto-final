@@ -71,3 +71,55 @@ footer {
     width: 100%;
     font-size: 0.9em;
 }
+
+
+
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-menu > a {
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a,
+.dropdown-content form {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-content a:hover,
+.dropdown-content form:hover {
+    background-color: #f0f0f0;
+}
+
+.user-menu:hover .dropdown-content {
+    display: block;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    color: black;
+    text-align: left;
+    padding: 10px;
+    width: 100%;
+    cursor: pointer;
+}
+.logout-form {
+    margin: 0;
+}

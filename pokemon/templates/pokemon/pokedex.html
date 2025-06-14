@@ -24,34 +24,102 @@
     a {
         text-decoration: none;
     }
+    .section {
+        margin-bottom: 40px;
+    }
 </style>
-<body>
-    <h1>Pokédex</h1>
+
+<h1>Pokédex</h1>
+
+<div class="section">
+    <h2>Pokémon Oficiales</h2>
     <div class="pokedex">
         {% for p in pokemons %}
-            <a href="{% url 'pokemon:pokemon' p.id %}">
-                <div class="pokemon" style="border: 4px solid;
-                    {% if p.secondary_type %}
-                        border-image: linear-gradient(90deg, {{ p.primary_type.rgb }}, {{ p.secondary_type.rgb }}) 1;
-                    {% else %}
-                        border-color: {{ p.primary_type.rgb }};
-                    {% endif %}
-                ">
-                    {% if p.normal_image %}
-                        {% thumbnail p.normal_image "96x96" format="PNG" crop="center" as thumb %}
-                            <img src="{{ thumb.url }}">
-                        {% endthumbnail %}
-                    {% endif %}
-                    <h2>{{ p }}</h2>
-                    <img src="{{ p.primary_type.icon.url }}" class="type-icon">
-                    {% if p.secondary_type %}
-                        <img src="{{ p.secondary_type.icon.url }}" class="type-icon">
-                    {% endif %}
-                </div>
-            </a>
+            {% if p.pokedex_number %}
+                <a href="{% url 'pokemon:pokemon' p.id %}">
+                    <div class="pokemon" style="border: 4px solid;
+                        {% if p.secondary_type %}
+                            border-image: linear-gradient(90deg, {{ p.primary_type.rgb }}, {{ p.secondary_type.rgb }}) 1;
+                        {% else %}
+                            border-color: {{ p.primary_type.rgb }};
+                        {% endif %}
+                    ">
+                        {% if p.normal_image %}
+                            {% thumbnail p.normal_image "96x96" format="PNG" as thumb %}
+                                <img src="{{ thumb.url }}">
+                            {% endthumbnail %}
+                        {% endif %}
+                        <h2>{{ p }}</h2>
+                        <img src="{{ p.primary_type.icon.url }}" class="type-icon">
+                        {% if p.secondary_type %}
+                            <img src="{{ p.secondary_type.icon.url }}" class="type-icon">
+                        {% endif %}
+                    </div>
+                </a>
+            {% endif %}
         {% empty %}
             <p>No hay Pokémon registrados todavía.</p>
         {% endfor %}
     </div>
-</body>
+</div>
+
+<div class="section">
+    <h2>Pokémon de Fans</h2>
+    <div class="pokedex">
+        {% for p in pokemons %}
+            {% if not p.pokedex_number %}
+                <a href="{% url 'pokemon:pokemon' p.id %}">
+                    <div class="pokemon" style="border: 4px solid;
+                        {% if p.secondary_type %}
+                            border-image: linear-gradient(90deg, {{ p.primary_type.rgb }}, {{ p.secondary_type.rgb }}) 1;
+                        {% else %}
+                            border-color: {{ p.primary_type.rgb }};
+                        {% endif %}
+                    ">
+                        {% if p.normal_image %}
+                            {% thumbnail p.normal_image "96x96" format="PNG" as thumb %}
+                                <img src="{{ thumb.url }}">
+                            {% endthumbnail %}
+                        {% endif %}
+                        <h2>{{ p }}</h2>
+                        <img src="{{ p.primary_type.icon.url }}" class="type-icon">
+                        {% if p.secondary_type %}
+                            <img src="{{ p.secondary_type.icon.url }}" class="type-icon">
+                        {% endif %}
+                    </div>
+                </a>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<div class="section">
+    <h2>Mega Evoluciones</h2>
+    <div class="pokedex">
+        {% for m in megaevolutions %}
+            <a href="{% url 'pokemon:megaevolution' m.id %}">
+                <div class="pokemon" style="border: 4px solid;
+                    {% if m.secondary_type %}
+                        border-image: linear-gradient(90deg, {{ m.primary_type.rgb }}, {{ m.secondary_type.rgb }}) 1;
+                    {% else %}
+                        border-color: {{ m.primary_type.rgb }};
+                    {% endif %}
+                ">
+                    {% if m.normal_image %}
+                        {% thumbnail m.normal_image "96x96" format="PNG" as thumb %}
+                            <img src="{{ thumb.url }}">
+                        {% endthumbnail %}
+                    {% endif %}
+                    <h2>{{ m.name }}</h2>
+                    <img src="{{ m.primary_type.icon.url }}" class="type-icon">
+                    {% if m.secondary_type %}
+                        <img src="{{ m.secondary_type.icon.url }}" class="type-icon">
+                    {% endif %}
+                </div>
+            </a>
+        {% empty %}
+            <p>No hay Mega Evoluciones registradas todavía.</p>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

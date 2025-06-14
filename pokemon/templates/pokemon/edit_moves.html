@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <link rel="stylesheet" href="{% static 'css/form.css' %}">
+
+  <h1>Editar movimientos de {{ pokemon.name }}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Guardar cambios</button>
+    <a href="{% url 'pokemon:pokemon' pokemon.id %}">Cancelar</a>
+  </form>
+{% endblock %}

@@ -3,7 +3,7 @@
 <div class="evolution-node">
   <div class="pokemon-card-small">
     {% if node.pokemon.normal_image %}
-      {% thumbnail node.pokemon.normal_image "64x64" format="PNG" crop="center" as thumb %}
+      {% thumbnail node.pokemon.normal_image "64x64" format="PNG" as thumb %}
         <a href="{% url 'pokemon:pokemon' node.pokemon.id %}"><img src="{{ thumb.url }}" alt="{{ node.pokemon.name }}"></a>
       {% endthumbnail %}
     {% endif %}

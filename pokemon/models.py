@@ -75,7 +75,7 @@ class Move(models.Model):
     description = models.TextField(blank=True, verbose_name="Descripción del Movimiento")
 
     def __str__(self):
-        return f"{self.name} ({self.movement_type})"
+        return f"{self.name} ({self.get_movement_type_display()})"
 
     class Meta:
         verbose_name = 'Movimiento'
@@ -164,7 +164,7 @@ class MegaEvolution(models.Model):
     primary_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name='megas_tipo_principal', verbose_name="Tipo Principal")
     secondary_type = models.ForeignKey(Type, on_delete=models.SET_NULL, null=True, blank=True, related_name='megas_tipo_secundario', verbose_name="Tipo Secundario")
     ability = models.ForeignKey(Ability, on_delete=models.CASCADE, verbose_name="Habilidad")
-    evolution_method = models.TextField(null=True, blank=True, verbose_name="Método de Mega Evolución")
+    evolution_method = models.TextField(verbose_name="Método de Mega Evolución")
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Creador")
 
     def __str__(self):

@@ -1,14 +1,19 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 
-from .forms import PokemonForm
+from .forms import PokemonForm, MegaEvolutionForm, EditMovesForm
 from .models import Pokemon, Type, TypeEffectiveness, MegaEvolution
 from .utils import calculate_combined_effectiveness
 
 
 def pokedex_view(request):
     pokemons = Pokemon.objects.all().order_by('pokedex_number')
-    return render(request, 'pokemon/pokedex.html', {'pokemons': pokemons})
+    megaevolutions = MegaEvolution.objects.all().order_by('base_pokemon__pokedex_number')
+    return render(request, 'pokemon/pokedex.html', {
+        'pokemons': pokemons,
+        'megaevolutions': megaevolutions,
+    })
 
 def pokemon_view(request, pokemon_id):
     pokemon = get_object_or_404(Pokemon, id=pokemon_id)
@@ -85,6 +90,16 @@ def megaevolution_view(request, megaevolution_id):
     }
     return render(request, 'pokemon/pokemon_detail.html', context)
 
+def profile_view(request, username):
+    user_profile = get_object_or_404(User, username=username)
+    pokemons = Pokemon.objects.filter(creator=user_profile)
+    megaevolutions = MegaEvolution.objects.filter(creator=user_profile)
+    return render(request, 'pokemon/profile.html', {
+        'pokemons': pokemons,
+        'megaevolutions': megaevolutions,
+        'user_profile': user_profile,
+    })
+
 @login_required
 def pokemon_creation(request):
     if request.method == 'POST':
@@ -97,6 +112,58 @@ def pokemon_creation(request):
     else:
         form = PokemonForm()
     return render(request, 'pokemon/create.html', {'form': form})
+
+@login_required
+def megaevolution_creation(request, pokemon_id):
+    pokemon = get_object_or_404(Pokemon, id=pokemon_id)
+
+    initial_data = {
+        'name': "Mega " + pokemon.name,
+        'hp': pokemon.hp,
+        'attack': pokemon.attack,
+        'defense': pokemon.defense,
+        'special_attack': pokemon.special_attack,
+        'special_defense': pokemon.special_defense,
+        'speed': pokemon.speed,
+        'weight': pokemon.weight,
+        'height': pokemon.height,
+        'primary_type': pokemon.primary_type,
+        'secondary_type': pokemon.secondary_type,
+        'ability': pokemon.primary_ability,
+    }
+
+    if request.method == 'POST':
+        form = MegaEvolutionForm(request.POST, request.FILES)
+        if form.is_valid():
+            mega = form.save(commit=False)
+            mega.base_pokemon = pokemon
+            mega.creator = request.user
+            mega.save()
+            return redirect('pokemon:megaevolution', megaevolution_id=mega.id)
+    else:
+        form = MegaEvolutionForm(initial=initial_data)
+
+    return render(request, 'pokemon/create_megaevolution.html', {
+        'form': form,
+        'pokemon': pokemon,
+    })
+
+@login_required
+def edit_moves(request, pokemon_id):
+    pokemon = get_object_or_404(Pokemon, id=pokemon_id)
+
+    if pokemon.creator != request.user:
+        return redirect('pokemon:pokemon', pokemon_id=pokemon.id)
+
+    if request.method == 'POST':
+        form = EditMovesForm(request.POST, instance=pokemon)
+        if form.is_valid():
+            form.save()
+            return redirect('pokemon:pokemon', pokemon_id=pokemon.id)
+    else:
+        form = EditMovesForm(instance=pokemon)
+
+    return render(request, 'pokemon/edit_moves.html', {'form': form, 'pokemon': pokemon})
 
 def type_table(request):
     types = Type.objects.all()

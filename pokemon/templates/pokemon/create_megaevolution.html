@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{% static 'css/form.css' %}">
 
 <div class="form-container">
-  <h2>Crear un nuevo Pokémon</h2>
+  <h2>Crear Mega Evolución para {{ pokemon.name }}</h2>
 
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
