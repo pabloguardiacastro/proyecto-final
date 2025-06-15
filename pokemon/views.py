@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 
-from .forms import PokemonForm, MegaEvolutionForm, EditMovesForm, PokemonEditForm, PokemonEvolutionForm
+from .forms import PokemonForm, MegaEvolutionForm, EditMovesForm, PokemonEditForm, PokemonEvolutionForm, CommentForm
 from .models import Pokemon, Type, TypeEffectiveness, MegaEvolution, Move, Ability
 from .utils import calculate_combined_effectiveness
 
@@ -18,8 +18,19 @@ def pokedex_view(request):
 
 def pokemon_view(request, pokemon_id):
     pokemon = get_object_or_404(Pokemon, id=pokemon_id)
-    combined_effectiveness = calculate_combined_effectiveness(pokemon.primary_type, pokemon.secondary_type)
 
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.pokemon = pokemon
+            comment.save()
+            return redirect('pokemon:pokemon', pokemon_id=pokemon.id)
+    else:
+        form = CommentForm()
+
+    combined_effectiveness = calculate_combined_effectiveness(pokemon.primary_type, pokemon.secondary_type)
     chain = pokemon.get_full_chain()
 
     immunities = []
@@ -52,11 +63,25 @@ def pokemon_view(request, pokemon_id):
         'neutral': neutral,
         'weaknesses': weaknesses,
         'super_weaknesses': super_weaknesses,
+        'form': form,
     }
+
     return render(request, 'pokemon/pokemon_detail.html', context)
 
 def megaevolution_view(request, megaevolution_id):
     pokemon = get_object_or_404(MegaEvolution, id=megaevolution_id)
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.megaevolution = pokemon
+            comment.save()
+            return redirect('pokemon:megaevolution', megaevolution_id=pokemon.id)
+    else:
+        form = CommentForm()
+
     combined_effectiveness = calculate_combined_effectiveness(pokemon.primary_type, pokemon.secondary_type)
 
     immunities = []
@@ -88,6 +113,7 @@ def megaevolution_view(request, megaevolution_id):
         'neutral': neutral,
         'weaknesses': weaknesses,
         'super_weaknesses': super_weaknesses,
+        'form': form,
     }
     return render(request, 'pokemon/pokemon_detail.html', context)
 

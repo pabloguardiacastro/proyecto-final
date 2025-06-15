@@ -177,3 +177,13 @@ class MegaEvolution(models.Model):
     class Meta:
         verbose_name = "Mega Evolución"
         verbose_name_plural = "Mega Evoluciones"
+
+class Comment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comments', verbose_name="Comentador")
+    pokemon = models.ForeignKey(Pokemon, null=True, blank=True, on_delete=models.CASCADE, related_name='comments', verbose_name="Pokémon")
+    megaevolution = models.ForeignKey(MegaEvolution, null=True, blank=True, on_delete=models.CASCADE, related_name='comments', verbose_name="Mega Evolución")
+    text = models.TextField(verbose_name="Contenido")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+
+    class Meta:
+        ordering = ['-created_at']

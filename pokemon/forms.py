@@ -1,6 +1,6 @@
 from django import forms
 
-from pokemon.models import Pokemon, MegaEvolution, Move
+from pokemon.models import Pokemon, MegaEvolution, Move, Comment
 
 
 class PokemonForm(forms.ModelForm):
@@ -37,3 +37,10 @@ class PokemonEditForm(forms.ModelForm):
     class Meta:
         model = Pokemon
         exclude = ['moves', 'creator', 'pokedex_number', 'pokedex_entry', 'generation', 'evolution_method', 'pre_evolution']
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Escribe tu comentario aquí...', 'style': 'width: 100%;'})}
+        labels = {'text': ''}

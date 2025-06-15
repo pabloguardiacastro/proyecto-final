@@ -107,6 +107,55 @@
     width: 20px;
     vertical-align: middle;
   }
+
+  .comments-section {
+    margin-top: 40px;
+    border-top: 2px solid #ccc;
+    padding-top: 20px;
+  }
+
+  .comment {
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+  }
+
+  .comment-meta {
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 5px;
+  }
+
+  .comment-text {
+    white-space: pre-wrap;
+  }
+
+  .comment-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    resize: vertical;
+    font-size: 1em;
+  }
+
+  .comment-form button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #3d7ea6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .comment-form button:hover {
+    background-color: #33698a;
+  }
 </style>
 
 <div class="pokemon-detail-container">
@@ -320,4 +369,34 @@
     {% endif %}
   </div>
 {% endif %}
+
+<div class="comments-section">
+  <h3>Comentarios</h3>
+
+  {% if user.is_authenticated %}
+    <div class="comment-form">
+      <h4>Agregar comentario</h4>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Comentar</button>
+      </form>
+    </div>
+  {% else %}
+    <p><a href="{% url 'login' %}">Inicia sesión</a> para comentar.</p>
+  {% endif %}
+
+  {% for comment in pokemon.comments.all %}
+    <div class="comment">
+      <div class="comment-meta">
+        <strong>{{ comment.user.username }}</strong> – {{ comment.created_at|date:"d/m/Y H:i" }}
+      </div>
+      <div class="comment-text">
+        {{ comment.text }}
+      </div>
+    </div>
+  {% empty %}
+    <p>No hay comentarios aún.</p>
+  {% endfor %}
+</div>
 {% endblock %}
