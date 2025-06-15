@@ -71,10 +71,6 @@ footer {
     width: 100%;
     font-size: 0.9em;
 }
-
-
-
-
 .user-menu {
     position: relative;
     display: inline-block;
@@ -116,9 +112,9 @@ footer {
     border: none;
     color: black;
     text-align: left;
-    padding: 10px;
     width: 100%;
     cursor: pointer;
+    text-decoration: none;
 }
 .logout-form {
     margin: 0;

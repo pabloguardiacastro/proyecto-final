@@ -8,6 +8,14 @@ class PokemonForm(forms.ModelForm):
         model = Pokemon
         fields = ['normal_image', 'name', 'gender', 'weight', 'height', 'primary_type', 'secondary_type', 'primary_ability', 'secondary_ability', 'hidden_ability', 'hp', 'attack', 'defense', 'special_attack', 'special_defense', 'speed']
 
+class PokemonEvolutionForm(PokemonForm):
+    class Meta(PokemonForm.Meta):
+        fields = PokemonForm.Meta.fields + ['evolution_method']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['evolution_method'].required = True
+
 class MegaEvolutionForm(forms.ModelForm):
     class Meta:
         model = MegaEvolution

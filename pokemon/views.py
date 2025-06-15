@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 
-from .forms import PokemonForm, MegaEvolutionForm, EditMovesForm, PokemonEditForm
+from .forms import PokemonForm, MegaEvolutionForm, EditMovesForm, PokemonEditForm, PokemonEvolutionForm
 from .models import Pokemon, Type, TypeEffectiveness, MegaEvolution, Move, Ability
 from .utils import calculate_combined_effectiveness
 
@@ -113,6 +113,41 @@ def pokemon_creation(request):
     else:
         form = PokemonForm()
     return render(request, 'pokemon/create.html', {'form': form})
+
+@login_required
+def evolution_creation(request, pokemon_id):
+    pokemon = get_object_or_404(Pokemon, id=pokemon_id)
+
+    initial_data = {
+        'hp': pokemon.hp,
+        'attack': pokemon.attack,
+        'defense': pokemon.defense,
+        'special_attack': pokemon.special_attack,
+        'special_defense': pokemon.special_defense,
+        'speed': pokemon.speed,
+        'weight': pokemon.weight,
+        'height': pokemon.height,
+        'primary_type': pokemon.primary_type,
+        'secondary_type': pokemon.secondary_type,
+        'primary_ability': pokemon.primary_ability,
+        'secondary_ability': pokemon.secondary_ability,
+        'hidden_ability': pokemon.hidden_ability,
+    }
+
+    if request.method == 'POST':
+        form = PokemonEvolutionForm(request.POST, request.FILES)
+        if form.is_valid():
+            new = form.save(commit=False)
+            new.pre_evolution = pokemon
+            new.creator = request.user
+            new.save()
+            return redirect('pokemon:pokemon', pokemon_id=new.id)
+    else:
+        form = PokemonEvolutionForm(initial=initial_data)
+
+    return render(request, 'pokemon/create.html', {
+        'form': form,
+    })
 
 @login_required
 def megaevolution_creation(request, pokemon_id):

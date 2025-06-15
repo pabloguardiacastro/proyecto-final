@@ -60,6 +60,8 @@
     display: inline-flex;
     align-items: center;
     gap: 15px;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 
   .pokemon-card-small {
@@ -283,18 +285,23 @@
 
 {% if chain %}
   <div class="evolution-chain">
-    <h3>Cadena evolutiva</h3>
+    <h3>Cadena evolutiva
+    {% if request.user.is_authenticated %}
+      <a href="{% url 'pokemon:new_evolution' pokemon.id %}" class="btn-crear" style="font-size: 0.9rem; padding: 4px 8px; background-color: #007bff; color: white; border-radius: 4px; text-decoration: none;">Crear Evolución</a>
+    {% endif %}
+    </h3>
     {% include "pokemon/pokemon_evolution_chain.html" with node=chain %}
   </div>
 {% endif %}
 
 {% if pokemon.megaevolutions.all or request.user.is_authenticated and not pokemon.base_pokemon %}
   <div class="mega-evolutions" style="margin-top: 40px;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h3>Megaevoluciones</h3>
+    <div style="text-align: center;">
+      <h3>Megaevoluciones
       {% if request.user.is_authenticated %}
         <a href="{% url 'pokemon:new_megaevolution' pokemon.id %}" class="btn-crear" style="font-size: 0.9rem; padding: 4px 8px; background-color: #007bff; color: white; border-radius: 4px; text-decoration: none;">Crear Mega Evolución</a>
       {% endif %}
+      </h3>
     </div>
     {% if pokemon.megaevolutions.all %}
       <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">

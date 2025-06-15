@@ -11,6 +11,7 @@ urlpatterns = [
     path('pokemon/<pokemon_id>/', views.pokemon_view, name='pokemon'),
     path('pokemon/<pokemon_id>/edit/', views.edit_pokemon, name='edit_pokemon'),
     path('pokemon/<pokemon_id>/edit-moves/', views.edit_moves, name='edit_moves'),
+    path('pokemon/<pokemon_id>/evolution/new/', views.evolution_creation, name='new_evolution'),
     path('pokemon/<pokemon_id>/mega/new/', views.megaevolution_creation, name='new_megaevolution'),
     path('megaevolution/<megaevolution_id>/', views.megaevolution_view, name='megaevolution'),
     path('moves/<move_id>/', views.move_view, name='move'),
