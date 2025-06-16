@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+
+{% block content %}
+  <style>
+    .pokemon {
+      border: 3px solid;
+      margin: 10px;
+      padding: 10px;
+      display: inline-block;
+      width: 200px;
+      text-align: center;
+    }
+    .pokemon img {
+      width: 96px;
+      height: 96px;
+    }
+    .type-icon {
+      width: 24px !important;
+      height: 24px !important;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+  </style>
+
+  <h1>Resultados para "{{ content }}"</h1>
+
+  {% if not pokemons and not megaevolutions and not moves and not abilities %}
+    <p>No se encontraron resultados.</p>
+  {% endif %}
+
+  {% if pokemons %}
+    <h2>Pokémon</h2>
+    {% for p in pokemons %}
+      <a href="{% url 'pokemon:pokemon' p.id %}">
+        <div class="pokemon" style="border: 4px solid;
+          {% if p.secondary_type %}
+            border-image: linear-gradient(90deg, {{ p.primary_type.rgb }}, {{ p.secondary_type.rgb }}) 1;
+          {% else %}
+            border-color: {{ p.primary_type.rgb }};
+          {% endif %}
+        ">
+          {% if p.normal_image %}
+            {% thumbnail p.normal_image "96x96" format="PNG" as thumb %}
+              <img src="{{ thumb.url }}">
+            {% endthumbnail %}
+          {% endif %}
+          <h2>{{ p }}</h2>
+          <img src="{{ p.primary_type.icon.url }}" class="type-icon">
+          {% if p.secondary_type %}
+            <img src="{{ p.secondary_type.icon.url }}" class="type-icon">
+          {% endif %}
+        </div>
+    </a>
+    {% endfor %}
+  {% endif %}
+
+  {% if megaevolutions %}
+    <h2>Megaevoluciones</h2>
+    {% for m in megaevolutions %}
+      <a href="{% url 'pokemon:megaevolution' m.id %}">
+        <div class="pokemon" style="border: 4px solid;
+          {% if m.secondary_type %}
+            border-image: linear-gradient(90deg, {{ m.primary_type.rgb }}, {{ m.secondary_type.rgb }}) 1;
+          {% else %}
+            border-color: {{ m.primary_type.rgb }};
+          {% endif %}
+        ">
+          {% if m.normal_image %}
+            {% thumbnail m.normal_image "96x96" format="PNG" as thumb %}
+              <img src="{{ thumb.url }}">
+            {% endthumbnail %}
+          {% endif %}
+          <h2>{{ m.name }}</h2>
+          <img src="{{ m.primary_type.icon.url }}" class="type-icon">
+          {% if m.secondary_type %}
+            <img src="{{ m.secondary_type.icon.url }}" class="type-icon">
+          {% endif %}
+        </div>
+      </a>
+    {% endfor %}
+  {% endif %}
+
+  {% if moves %}
+    <h2>Movimientos</h2>
+    <ul>
+      {% for move in moves %}
+        <li><a href="{% url 'pokemon:move' move.id %}">{{ move.name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if abilities %}
+    <h2>Habilidades</h2>
+    <ul>
+      {% for ability in abilities %}
+        <li><a href="{% url 'pokemon:ability' ability.id %}">{{ ability.name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

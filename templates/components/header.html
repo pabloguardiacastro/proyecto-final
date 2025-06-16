@@ -5,6 +5,21 @@
         </h1>
         <nav class="main-nav">
             <ul>
+                <form id="search-form" onsubmit="return redirectSearch()" style="display: flex; gap: 8px;">
+                    <input type="text" id="search-input" placeholder="Buscar..." required style="padding: 4px;">
+                    <button type="submit">Buscar</button>
+                </form>
+
+                <script>
+                    function redirectSearch() {
+                        const input = document.getElementById('search-input').value.trim();
+                        if (input) {
+                            window.location.href = `/search/${encodeURIComponent(input)}/`;
+                        }
+                        return false; // evita el envío clásico del formulario
+                    }
+                </script>
+
                 <li><a href="{% url 'pokemon:type_table' %}">Tabla de Tipos</a></li>
 
                 <li class="user-menu">

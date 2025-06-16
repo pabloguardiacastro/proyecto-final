@@ -17,4 +17,5 @@ urlpatterns = [
     path('megaevolution/<megaevolution_id>/edit/', views.edit_megaevolution, name='edit_megaevolution'),
     path('moves/<move_id>/', views.move_view, name='move'),
     path('abilities/<ability_id>/', views.ability_view, name='ability'),
+    path('search/<content>/', views.search_view, name='search'),
 ]

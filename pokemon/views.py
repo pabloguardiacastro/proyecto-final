@@ -277,3 +277,17 @@ def move_view(request, move_id):
 def ability_view(request, ability_id):
     ability = get_object_or_404(Ability, id=ability_id)
     return render(request, 'pokemon/ability_detail.html', {'ability': ability})
+
+def search_view(request, content):
+    pokemons = Pokemon.objects.filter(name__icontains=content)
+    megaevolutions = MegaEvolution.objects.filter(name__icontains=content)
+    moves = Move.objects.filter(name__icontains=content)
+    abilities = Ability.objects.filter(name__icontains=content)
+
+    return render(request, 'pokemon/search_results.html', {
+        'content': content,
+        'pokemons': pokemons,
+        'megaevolutions': megaevolutions,
+        'moves': moves,
+        'abilities': abilities,
+    })
