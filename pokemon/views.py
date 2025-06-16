@@ -227,6 +227,22 @@ def edit_pokemon(request, pokemon_id):
     return render(request, 'pokemon/edit.html', {'form': form, 'pokemon': pokemon})
 
 @login_required
+def edit_megaevolution(request, megaevolution_id):
+    pokemon = get_object_or_404(MegaEvolution, pk=megaevolution_id)
+    if request.user != pokemon.creator:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        form = MegaEvolutionForm(request.POST, request.FILES, instance=pokemon)
+        if form.is_valid():
+            form.save()
+            return redirect('pokemon:megaevolution', megaevolution_id=pokemon.id)
+    else:
+        form = MegaEvolutionForm(instance=pokemon)
+
+    return render(request, 'pokemon/edit.html', {'form': form, 'pokemon': pokemon})
+
+@login_required
 def edit_moves(request, pokemon_id):
     pokemon = get_object_or_404(Pokemon, id=pokemon_id)
 

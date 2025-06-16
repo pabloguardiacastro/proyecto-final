@@ -14,6 +14,7 @@ urlpatterns = [
     path('pokemon/<pokemon_id>/evolution/new/', views.evolution_creation, name='new_evolution'),
     path('pokemon/<pokemon_id>/mega/new/', views.megaevolution_creation, name='new_megaevolution'),
     path('megaevolution/<megaevolution_id>/', views.megaevolution_view, name='megaevolution'),
+    path('megaevolution/<megaevolution_id>/edit/', views.edit_megaevolution, name='edit_megaevolution'),
     path('moves/<move_id>/', views.move_view, name='move'),
     path('abilities/<ability_id>/', views.ability_view, name='ability'),
 ]
