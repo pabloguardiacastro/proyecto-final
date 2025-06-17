@@ -1,0 +1,8 @@
+<div class="comment">
+  <div class="comment-meta">
+    <strong>{{ comment.user.username }}</strong> – {{ comment.created_at|date:"d/m/Y H:i" }}
+  </div>
+  <div class="comment-text">
+    {{ comment.text }}
+  </div>
+</div>

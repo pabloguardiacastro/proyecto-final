@@ -1,10 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.template.loader import render_to_string
 
 from .forms import PokemonForm, MegaEvolutionForm, EditMovesForm, PokemonEditForm, PokemonEvolutionForm, CommentForm
-from .models import Pokemon, Type, TypeEffectiveness, MegaEvolution, Move, Ability
+from .models import Pokemon, Type, TypeEffectiveness, MegaEvolution, Move, Ability, Comment
 from .utils import calculate_combined_effectiveness
 
 
@@ -18,17 +19,6 @@ def pokedex_view(request):
 
 def pokemon_view(request, pokemon_id):
     pokemon = get_object_or_404(Pokemon, id=pokemon_id)
-
-    if request.method == "POST":
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.user = request.user
-            comment.pokemon = pokemon
-            comment.save()
-            return redirect('pokemon:pokemon', pokemon_id=pokemon.id)
-    else:
-        form = CommentForm()
 
     combined_effectiveness = calculate_combined_effectiveness(pokemon.primary_type, pokemon.secondary_type)
     chain = pokemon.get_full_chain()
@@ -63,24 +53,12 @@ def pokemon_view(request, pokemon_id):
         'neutral': neutral,
         'weaknesses': weaknesses,
         'super_weaknesses': super_weaknesses,
-        'form': form,
     }
 
     return render(request, 'pokemon/pokemon_detail.html', context)
 
 def megaevolution_view(request, megaevolution_id):
     pokemon = get_object_or_404(MegaEvolution, id=megaevolution_id)
-
-    if request.method == "POST":
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.user = request.user
-            comment.megaevolution = pokemon
-            comment.save()
-            return redirect('pokemon:megaevolution', megaevolution_id=pokemon.id)
-    else:
-        form = CommentForm()
 
     combined_effectiveness = calculate_combined_effectiveness(pokemon.primary_type, pokemon.secondary_type)
 
@@ -113,7 +91,6 @@ def megaevolution_view(request, megaevolution_id):
         'neutral': neutral,
         'weaknesses': weaknesses,
         'super_weaknesses': super_weaknesses,
-        'form': form,
     }
     return render(request, 'pokemon/pokemon_detail.html', context)
 
@@ -291,3 +268,32 @@ def search_view(request, content):
         'moves': moves,
         'abilities': abilities,
     })
+
+@login_required
+def add_comment(request):
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        pokemon_id = request.POST.get('pokemon_id')
+        mega_id = request.POST.get('mega_id')
+
+        if not text:
+            return JsonResponse({'error': 'Texto vacío'}, status=400)
+
+        comment = Comment.objects.create(
+            user=request.user,
+            text=text,
+            pokemon_id=pokemon_id if pokemon_id else None,
+            megaevolution_id=mega_id if mega_id else None
+        )
+
+        if pokemon_id:
+            comments = Comment.objects.filter(pokemon_id=pokemon_id).order_by('-created_at')
+        else:
+            comments = Comment.objects.filter(megaevolution_id=mega_id).order_by('-created_at')
+
+        html = ""
+        for comment in comments:
+            html += render_to_string('pokemon/components/comment.html', {'comment': comment}, request=request)
+        return JsonResponse({'html': html})
+
+    return JsonResponse({'error': 'Error'}, status=405)

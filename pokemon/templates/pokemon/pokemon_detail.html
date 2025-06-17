@@ -132,7 +132,7 @@
     white-space: pre-wrap;
   }
 
-  .comment-form textarea {
+  #comment-form textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid #aaa;
@@ -141,7 +141,7 @@
     font-size: 1em;
   }
 
-  .comment-form button {
+  #comment-form button {
     margin-top: 10px;
     margin-bottom: 10px;
     background-color: #3d7ea6;
@@ -153,7 +153,7 @@
     transition: background-color 0.2s ease;
   }
 
-  .comment-form button:hover {
+  #comment-form button:hover {
     background-color: #33698a;
   }
 </style>
@@ -378,29 +378,50 @@
   <h3>Comentarios</h3>
 
   {% if user.is_authenticated %}
-    <div class="comment-form">
-      <h4>Agregar comentario</h4>
-      <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Comentar</button>
-      </form>
-    </div>
+    <h4>Agregar comentario</h4>
+    <form id="comment-form" action="{% url 'pokemon:add_comment' %}" method="post">
+      {% csrf_token %}
+      <textarea name="text" placeholder="Escribe un comentario..." required></textarea>
+      <input type="hidden" name="{% if pokemon.base_pokemon %}mega_id{% else %}pokemon_id{% endif %}" value="{{ pokemon.id }}">
+      <button type="submit">Comentar</button>
+    </form>
   {% else %}
     <p><a href="{% url 'login' %}">Inicia sesión</a> para comentar.</p>
   {% endif %}
-
-  {% for comment in pokemon.comments.all %}
-    <div class="comment">
-      <div class="comment-meta">
-        <strong>{{ comment.user.username }}</strong> – {{ comment.created_at|date:"d/m/Y H:i" }}
-      </div>
-      <div class="comment-text">
-        {{ comment.text }}
-      </div>
-    </div>
-  {% empty %}
-    <p>No hay comentarios aún.</p>
-  {% endfor %}
+  <div id="comment-list">
+    {% for comment in pokemon.comments.all %}
+      {% include 'pokemon/components/comment.html' with comment=comment %}
+    {% empty %}
+      <p>No hay comentarios aún.</p>
+    {% endfor %}
+  </div>
 </div>
+
+<script>
+  document.getElementById('comment-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+      },
+      body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.html) {
+        document.getElementById('comment-list').innerHTML = data.html;
+        form.reset();
+      } else if (data.error) {
+        alert(data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  });
+</script>
 {% endblock %}
